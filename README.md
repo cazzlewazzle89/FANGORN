@@ -29,7 +29,7 @@ Make sure these are in your $PATH
 | [TaxonKit](https://bioinf.shenwei.me/taxonkit/) | 0.8.0  |
 | [VSEARCH](https://github.com/torognes/vsearch) | 2.17.1  |
 
-## R Packages
+### R Packages
 
 | Package | Version Tested |
 | --------|----------------|
