@@ -7,8 +7,7 @@ Please get in touch if you have any comments, issues, or suggestions for improve
 
 I plan to update the database with each new GTDB release. For the RefSeq/NCBI version - every 12 months seems logical.
 
-Note: If you want to build your own version using the NCBI taxonomy system, make sure you have the most up-to-date version of the taxonomy database. I do this using the commands described in the [TaxonKit manual](https://bioinf.shenwei.me/taxonkit/usage/#before-use).
-
+Note: If you want to build your own version using the NCBI taxonomy system, make sure you have the most up-to-date version of the taxonomy database. I do this using the commands described in the [TaxonKit manual](https://bioinf.shenwei.me/taxonkit/usage/#before-use) described below.  
 ```bash
 wget -c ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz 
 tar -zxvf taxdump.tar.gz
@@ -17,6 +16,7 @@ mkdir -p TaxonKit/
 mv names.dmp nodes.dmp delnodes.dmp merged.dmp TaxonKit/
 rm -f citations.dmp division.dmp gc.prt gencode.dmp readme.txt taxdump.tar.gz
 ```
+You do not need to do this when using the GTDB taxonomy system as the information is available on [the website](https://gtdb.ecogenomic.org/downloads) and will be automatically downloaded in the scripts provided.
 
 ## Dependencies  
 Make sure these are in your $PATH  
