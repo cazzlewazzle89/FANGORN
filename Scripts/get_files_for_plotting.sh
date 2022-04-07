@@ -1,0 +1,21 @@
+#!/bin/sh
+
+mkdir FilesForPlotting/
+
+cp Fangorn_GTDB/Outputs_Complete/master_rrna.gff FilesForPlotting/gtdb_complete_master_rrna.gff
+cp Fangorn_GTDB/Outputs_Incomplete/master_rrna.gff FilesForPlotting/gtdb_incomplete_master_rrna.gff
+cp Fangorn_GTDB/Outputs_Combined/vsearch_centroids.tsv FilesForPlotting/gtdb_combined_vsearch_centroids.tsv
+cp Fangorn_GTDB/Outputs_Combined/vsearch_hits.tsv FilesForPlotting/gtdb_combined_vsearch_hits.tsv
+cp Fangorn_GTDB/gtdb_taxonomy.tsv FilesForPlotting/gtdb_assemblytaxonomy.tsv
+cp Database/GTDB/Complete/taxRep.tsv FilesForPlotting/gtdb_complete_taxRep.tsv
+cp Database/GTDB/Combined/taxRep.tsv FilesForPlotting/gtdb_combined_taxRep.tsv
+cp Fangorn_GTDB/Outputs_Combined/taxCombined.tsv FilesForPlotting/gtdb_taxCombined.tsv
+
+cp Fangorn_RefSeq/Outputs_Complete/master_rrna.gff FilesForPlotting/refseq_complete_master_rrna.gff
+cp Fangorn_RefSeq/Outputs_Incomplete/master_rrna.gff FilesForPlotting/refseq_incomplete_master_rrna.gff
+cp Fangorn_RefSeq/Outputs_Combined/vsearch_centroids.tsv FilesForPlotting/refseq_combined_vsearch_centroids.tsv
+cp Fangorn_RefSeq/Outputs_Combined/vsearch_hits.tsv FilesForPlotting/refseq_combined_vsearch_hits.tsv
+cp Fangorn_RefSeq/assemblyaccession_taxid_lineage_mpa.txt FilesForPlotting/refseq_assemblytaxonomy.tsv
+cp Database/RefSeq/Complete/taxRep.tsv FilesForPlotting/refseq_complete_taxRep.tsv
+cp Database/RefSeq/Combined/taxRep.tsv FilesForPlotting/refseq_combined_taxRep.tsv
+cp Fangorn_RefSeq/Outputs_Combined/taxCombined.tsv FilesForPlotting/refseq_taxCombined.tsv
