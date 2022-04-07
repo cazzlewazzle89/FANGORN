@@ -1,4 +1,4 @@
-# FANGORN: Full-length Amplicons for the Next Generation Of rRNa analysis
+# FANGORN: _F_ull-length _A_mplicons for the _N_ext _G_eneration Of r_RN_a analysis
 ### A quality-checked and publicly available database of full-length 16S-ITS-23S rRNA operon sequences
 
 This repository makes available the scripts used to build the FANGORN databases described in this preprint (REMINDER TO LINK) and available for download [here](https://melbourne.figshare.com/account/projects/119793/articles/19530565).
