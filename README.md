@@ -46,4 +46,4 @@ By default they will use:
 - 50 threads for VSEARCH clustering  
 - 20 threads for identifying rRNA genes in genomes without accompanying annotation using Barrnap  
 
-These settings, along with Vsearch clustering identity (default: 99.9%) and output directory (default: ./Fangorn_GTDB/ or ./Fangorn_RefSeq) can be changed by editing the relevant values in lines 2-7 of the script. 
+These settings, along with Vsearch clustering identity (default: 99.9%) and output directory (default: `./Fangorn_GTDB/` or `./Fangorn_RefSeq/`) can be changed by editing the relevant values in lines 2-7 of the script. 
