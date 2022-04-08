@@ -341,19 +341,12 @@ sed -i 's/centroid=// ; s/;seqs=.*//' Outputs_Complete/nrCon.fna
 sed -i 's/centroid=// ; s/;seqs=.*//' Outputs_Combined/nrCon.fna
 
 # move database files to single directory
-mkdir -p Database/Complete/
-mkdir -p Database/Combined/
+mkdir -p Database/
 
-sortbyname.sh \
-    in=Outputs_Complete/full_operons_sorted.fna \
-    out=Database/Complete/full.fna.gz
 sortbyname.sh \
     in=Outputs_Combined/full_operons_sorted.fna \
     out=Database/Combined/full.fna.gz
 
-sortbyname.sh \
-    in=Outputs_Complete/nrRep.fna \
-    out=Database/Complete/nrRep.fna.gz
 sortbyname.sh \
     in=Outputs_Complete/nrCon.fna \
     out=Database/Complete/nrCon.fna.gz
