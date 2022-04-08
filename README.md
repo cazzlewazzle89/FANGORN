@@ -38,6 +38,9 @@ Make sure these are in your $PATH
 | [Tidyverse](https://www.tidyverse.org/) | 1.3.1 |
 | [Ape](https://cran.r-project.org/web/packages/ape/index.html) | 5.0 |
 
+The conda environment that I used to build the database can be created using `conda env create -f fangorn.yml` (the yml is provded in this repository).  
+This will create an environment called `fangorn` which can be loaded with `conda activate fangorn`
+
 ## Usage
 
 `refseq_fangorn.sh` and `gtdb_fangorn.sh` are used to build databases using RefSeq and GTDB taxonomy respectively.  
