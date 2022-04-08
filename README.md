@@ -45,4 +45,5 @@ By default they will use:
 - 50 parallel processes to download assemblies and annotations and edit seqid headers  
 - 50 threads for VSEARCH clustering  
 - 20 threads for identifying rRNA genes in genomes without accompanying annotation using Barrnap  
+
 These settings, along with Vsearch clustering identity (default: 99.9%) and output directory (default: ./Fangorn_[GTDB/RefSeq]) can be changed by editing the relevant values in lines 2-7 of the script. 
