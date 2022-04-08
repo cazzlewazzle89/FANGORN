@@ -240,7 +240,7 @@ awk '/^>/ {if (seqlen) print seqlen;print;seqlen=0;next} {seqlen+=length($0)}END
     paste - - > Outputs_Incomplete/seq_length.tsv
 
 # run custom R script to filter and reformat annotation
-# takes barrnap output as input
+# takes GFF annotation as input
 # for every 16S gene, identifies the closest 23S gene with the same seqid and strand values
 # identifies unlined rRNA operons and those that cross the chromosome start/end boundary, removes these and writes their details to 'operons_unlinked_or_crossingboundary.tsv'
 # writes coordinates of ITS regions to 'combined_ITS.gff'
