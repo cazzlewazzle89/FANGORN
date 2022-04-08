@@ -37,3 +37,8 @@ Make sure these are in your $PATH
 | --------|----------------|
 | [Tidyverse](https://www.tidyverse.org/) | 1.3.1 |
 | [Ape](https://cran.r-project.org/web/packages/ape/index.html) | 5.0 |
+
+## Usage
+
+`refseq_fangorn.sh` and `gtdb_fangorn.sh` are used to build databases using RefSeq and GTDB taxonomy respectively.
+By default they will use 50 parallel processes to download assemblies and annotations and edit seqid headers, 50 threads for VSEARCH clustering, and 20 threads for identifying rRNA genes in genomes without accompanying annotation using Barrnap. These settings, along with Vsearch clustering identity (default: 99.9%) and output directory (default: ${PWD}/Fangorn_[GTDB/RefSeq]) can be changed by editing the relevant values in lines 2-7 of the script. 
