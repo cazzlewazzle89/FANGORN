@@ -1,14 +1,18 @@
 #!/bin/sh
 VAR_PARALLEL_DL=50 # number of parallel processes to run when downloading assemblies & annotations
 VAR_PARALLEL_EDIT=50 # number of parallel processes to run when editing seqid headers
+VAR_THREADS_SEQLENGTH=50 # number of threads to use when calculating sequence lengths with seqkit
 VAR_THREADS_VSEARCH=50 # number of threads to use then clustering operon sequences with vsearch
 VAR_CLUSTERID_VSEARCH=0.999 # vsearch clustering identity
-VAR_DB_TAXONDB="/home/cwwalsh/Databases/Taxonkit_DB/" # path to Taxonkit database
-VAR_OUTPUT_DIRECTORY=${PWD}/Fangorn_RefSeq # specify output directory name for databases
+VAR_DB_TAXONDB="/home/cwwalsh/Databases/TaxonKit/" # path to Taxonkit database
+VAR_OUTPUT_DIRECTORY=Database_RefSeq_207 # specify output directory name for databases (path must be relative from Current Working Directory)
+VAR_TEMP_DIRECTORY=${PWD}/Fangorn_RefSeq_207/ # specify temp directory to store intermediary files (path must be relative from Current Working Directory)
+
+VAR_SOURCE_DIRECTORY=${PWD}
 
 # make output directory and move shell to run from there
-mkdir ${VAR_OUTPUT_DIRECTORY}
-cd ${VAR_OUTPUT_DIRECTORY}
+mkdir ${VAR_TEMP_DIRECTORY}
+cd ${VAR_TEMP_DIRECTORY}
 
 # make directories to store genomes used for building the database
 mkdir -p Genomes_Complete/
@@ -46,7 +50,7 @@ awk 'BEGIN{FS=OFS="/";filesuffix="genomic.fna.gz"}{ftpdir=$0;asm=$10;file=asm"_"
 parallel -a ftpdownload -j ${VAR_PARALLEL_DL}
 rm -f ftpdownload
 
-awk 'BEGIN{FS=OFS="/";filesuffix="genomic.fna.gz"}{ftpdir=$0;asm=$10;file=asm"_"filesuffix;print "wget -P Genomes_Incomplete/"ftpdir,file}' \
+awk 'BEGIN{FS=OFS="/";filesuffix="genomic.fna.gz"}{ftpdir=$0;asm=$10;file=asm"_"filesuffix;print "wget -P Genomes_Incomplete/ "ftpdir,file}' \
     ftpdirpathsincomplete > ftpdownload
 parallel -a ftpdownload -j ${VAR_PARALLEL_DL}
 rm -f ftpdownload
@@ -56,7 +60,7 @@ find Genomes_Complete/ -type f -name *.fna.gz | awk -F '.[0-9]_' '{print "mv "$0
 find Genomes_Incomplete/ -type f -name *.fna.gz | awk -F '.[0-9]_' '{print "mv "$0" "$1".fna.gz"}' | bash
 
 # edit fasta headers to contain the RefSeq assembly accession
-for i in $(find Genomes_Complete/ -type f -name *.fna.gz | sed 's/RefSeq\/Genomes_Complete\///' | sed 's/.fna.gz//')
+for i in $(find Genomes_Complete/ -type f -name *.fna.gz | sed 's/Genomes_Complete\///' | sed 's/.fna.gz//')
 do
     echo mv Genomes_Complete/${i}.fna.gz Genomes_Complete/temp_${i}.fna.gz \; \
         zcat Genomes_Complete/temp_${i}.fna.gz \| \
@@ -67,7 +71,7 @@ done > do_edit.sh
 parallel -a do_edit.sh -j ${VAR_PARALLEL_EDIT}
 rm -f do_edit.sh
 
-for i in $(find Genomes_Incomplete/ -type f -name *.fna.gz | sed 's/RefSeq\/Genomes_Incomplete\///' | sed 's/.fna.gz//')
+for i in $(find Genomes_Incomplete/ -type f -name *.fna.gz | sed 's/Genomes_Incomplete\///' | sed 's/.fna.gz//')
 do
     echo mv Genomes_Incomplete/${i}.fna.gz Genomes_Incomplete/temp_${i}.fna.gz \; \
     zcat Genomes_Incomplete/temp_${i}.fna.gz \| \
@@ -103,7 +107,7 @@ find Annotation_Incomplete/ -type f -name *.gff.gz | \
     awk -F '.[0-9]_' '{print "mv "$0" "$1".gff.gz"}' | bash
 
 # extract rRNA genes and edit annotation seqids to contain RefSeq accession and match fasta headers
-for i in $(find Annotation_Complete/ -type f -name '*.gff.gz' | sed 's/RefSeq\/Annotation_Complete\/// ; s/\.gff\.gz//')
+for i in $(find Annotation_Complete/ -type f -name '*.gff.gz' | sed 's/Annotation_Complete\/// ; s/\.gff\.gz//')
 do
     echo zcat Annotation_Complete/${i}.gff.gz \| \
     awk \'\$3==\"rRNA\"\' \| \
@@ -112,7 +116,7 @@ done > getRNA.sh
 parallel -a getRNA.sh -j ${VAR_PARALLEL_EDIT}
 rm -f getRNA.sh
 
-for i in $(find Annotation_Incomplete/ -type f -name '*.gff.gz' | sed 's/RefSeq\/Annotation_Incomplete\/// ; s/\.gff\.gz//')
+for i in $(find Annotation_Incomplete/ -type f -name '*.gff.gz' | sed 's/Annotation_Incomplete\/// ; s/\.gff\.gz//')
 do
     echo zcat Annotation_Incomplete/${i}.gff.gz \| \
     awk \'\$3==\"rRNA\"\' \| \
@@ -137,14 +141,8 @@ find Annotation_Incomplete/ -type f -name "*_rrna.gff" \
 
 # calculate the length of all sequences in mulitfasta
 # this info will be used later to discard operons which cross the start/end boundary of the chromosome
-awk '/^>/ {if (seqlen) print seqlen;print;seqlen=0;next} {seqlen+=length($0)}END{print seqlen}' Outputs_Complete/combined.fna | \
-    sed 's/\.[0-9] .*//' | \
-    sed 's/^>//' | \
-    paste - - > Outputs_Complete/seq_length.tsv
-awk '/^>/ {if (seqlen) print seqlen;print;seqlen=0;next} {seqlen+=length($0)}END{print seqlen}' Outputs_Incomplete/combined.fna | \
-    sed 's/\.[0-9] .*//' | \
-    sed 's/^>//' | \
-    paste - - > Outputs_Incomplete/seq_length.tsv
+seqkit fx2tab Outputs_Complete/combined.fna -n -l -j ${VAR_THREADS_SEQLENGTH} > Outputs_Complete/seq_length.tsv
+seqkit fx2tab Outputs_Incomplete/combined.fna -n -l -j ${VAR_THREADS_SEQLENGTH} > Outputs_Incomplete/seq_length.tsv
 
 # run custom R script to filter and reformat annotation
 # takes GFF annotation as input
@@ -153,8 +151,8 @@ awk '/^>/ {if (seqlen) print seqlen;print;seqlen=0;next} {seqlen+=length($0)}END
 # writes coordinates of ITS regions to 'combined_ITS.gff'
 # writes coordinates of 16S-ITS-23S regions full_operons.gff' for extraction later with bedtools
 # writes 'operon_identifiers.txt' with the unique operon identifiers that are substituted into the fasta headers later
-Rscript Scripts/refseq_complete_filter_make_gff.R
-Rscript Scripts/refseq_incomplete_filter_make_gff.R
+Rscript ${VAR_SOURCE_DIRECTORY}/Scripts/refseq_complete_filter_make_gff.R
+Rscript ${VAR_SOURCE_DIRECTORY}/Scripts/refseq_incomplete_filter_make_gff.R
 
 # create a multifasta file containing all rRNA operons
 bedtools getfasta \
@@ -214,7 +212,6 @@ taxonkit reformat \
     -P assemblyaccession_taxid_lineage.txt \
     --data-dir ${VAR_DB_TAXONDB} | \
     cut -f 1,4 > assemblyaccession_taxid_lineage_mpa.txt
-sed -i 's/^>//' Outputs_Complete/operon_identifier_lineage_mpa.txt
 
 # tidying up intermediary files
 rm -f assemblyaccession_taxid.txt assemblyaccession_taxid_lineage.txt
@@ -227,13 +224,20 @@ sortbyname.sh \
     out=Outputs_Complete/full_operons_sorted.fna \
     length \
     descending
-rm -f Outputs_Complete/full_operons_identifiers.fna
 
 sortbyname.sh \
     in=Outputs_Incomplete/full_operons_identifiers.fna \
     out=Outputs_Incomplete/full_operons_sorted.fna \
     length \
     descending
+
+# combines all operons to make a comprehensive multifasta
+mkdir Outputs_Combined/
+
+cat Outputs_Complete/full_operons_identifiers.fna \
+    Outputs_Incomplete/full_operons_identifiers.fna > Outputs_Combined/full_operons_identifiers.fna
+
+rm -f Outputs_Complete/full_operons_identifiers.fna
 rm -f Outputs_Incomplete/full_operons_identifiers.fna
 
 # removes redundant sequences from Complete Assemblies dataset based on specified identity cutoff
@@ -246,6 +250,7 @@ vsearch \
     --threads ${VAR_THREADS_VSEARCH} \
     -log Outputs_Complete/vsearchlog.txt \
     --consout Outputs_Complete/nrCon.fna
+
 cat Outputs_Complete/clusters.tsv | \
     awk '$1=="S"' > Outputs_Complete/vsearch_centroids.tsv
 cat Outputs_Complete/clusters.tsv | \
@@ -256,10 +261,11 @@ cat Outputs_Complete/clusters.tsv | \
 # adds operon sequences from Incomplete Assemblies to the NR dataset generated from complete assemblies, reruns clustering, and extracts relevant cluster information
 # only adds NR sequences from Incomplete genome assemblies if they are not already represented in the Complete dataset
 # also combines the taxonomy tables of these incomplete operons
-mkdir Outputs_Combined/
-cat Outputs_Complete/nrRep.fna Outputs_Incomplete/full_operons_sorted.fna > Outputs_Combined/full_operons_sorted.fna
+cat Outputs_Complete/nrRep.fna \
+    Outputs_Incomplete/full_operons_sorted.fna > Outputs_Combined/full_operons_sorted_vsearchinput.fna
+
 vsearch \
-    --cluster_smallmem Outputs_Combined/full_operons_sorted.fna \
+    --cluster_smallmem Outputs_Combined/full_operons_sorted_vsearchinput.fna \
     --id ${VAR_CLUSTERID_VSEARCH} \
     --centroids Outputs_Combined/nrRep.fna \
     --uc Outputs_Combined/clusters.tsv \
@@ -274,35 +280,47 @@ cat Outputs_Combined/clusters.tsv | \
 cat Outputs_Combined/clusters.tsv | \
     awk '$1=="H"' > Outputs_Combined/vsearch_hits.tsv
 
+rm -f Outputs_Combined/full_operons_sorted_vsearchinput.fna
+
 # edit fasta headers of nrCon sequence files
 sed -i 's/centroid=// ; s/;seqs=.*//' Outputs_Complete/nrCon.fna 
 sed -i 's/centroid=// ; s/;seqs=.*//' Outputs_Combined/nrCon.fna
 
 # move database files to single directory
-mkdir -p Database_RefSeq/Full/
-mkdir -p Database_RefSeq/NR/
+mkdir -p Database/Full/
+mkdir -p Database/NR/
 
-sortbyname.sh \
-    in=Outputs_Combined/full_operons_sorted.fna \
-    out=Database_RefSeq/Full/full.fna.gz
+mv Outputs_Combined/full_operons_identifiers.fna Database/Full/full.fna
+gzip Database/Full/full.fna
 
 sortbyname.sh \
     in=Outputs_Combined/nrRep.fna \
-    out=Database_RefSeq/NR/nrRep.fna.gz
+    out=Database/NR/nrRep.fna.gz
 
 sortbyname.sh \
     in=Outputs_Combined/nrCon.fna \
-    out=Database_RefSeq/NR/nrCon.fna.gz
+    out=Database/NR/nrCon.fna.gz
 
 # remove database sequence files from output directories
-rm -f Outputs_Combined/full_operons_sorted.fna
 rm -f Outputs_Combined/nrRep.fna
 rm -f Outputs_Combined/nrCon.fna
 
 # generate database taxonomy files and move to database directory
-Rscript Scripts/refseq_get_taxonomy.R
-mv Outputs_Combined/taxFull.tsv Database_RefSeq/Full/taxFull.tsv
-mv Outputs_Combined/taxRep.tsv Database_RefSeq/NR/taxRep.tsv
-mv Outputs_Combined/taxLCA.tsv Database_RefSeq/NR/taxLCA.tsv
-mv Outputs_Combined/taxMaj.tsv Database_RefSeq/NR/taxMaj.tsv
+Rscript ${VAR_SOURCE_DIRECTORY}/Scripts/refseq_get_taxonomy.R
+mv Outputs_Combined/taxFull.tsv Database/Full/taxFull.tsv
+mv Outputs_Combined/taxRep.tsv Database/NR/taxRep.tsv
+mv Outputs_Combined/taxLCA.tsv Database/NR/taxLCA.tsv
+mv Outputs_Combined/taxMaj.tsv Database/NR/taxMaj.tsv
+
+# calculate mean and median genome size for each taxon in the database (at all 7 taxonomic ranks)
+# doing this using either all genomes or complete genomes only
+Rscript ${VAR_SOURCE_DIRECTORY}/Scripts/refseq_get_genome_length.R
+cp stats_genomelength.tsv Database/
+
+# calculate mean and median rrn operon copy number for each taxon in the database (at all 7 taxonomic ranks)
+Rscript ${VAR_SOURCE_DIRECTORY}/Scripts/refseq_get_copy_number.R
+cp stats_copynumber.tsv Database/
+
+# move database to current working directory
+mv Database/ ${VAR_SOURCE_DIRECTORY}/${VAR_OUTPUT_DIRECTORY}
 

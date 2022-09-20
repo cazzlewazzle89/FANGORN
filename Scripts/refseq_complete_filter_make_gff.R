@@ -1,7 +1,7 @@
 suppressMessages(suppressWarnings(library('tidyverse')))
 
 # read input gff, select informative columns, and edit rRNA gene names
-rna_gff <- ape::read.gff('RefSeq/Outputs_Complete/combined_rrna.gff', GFF3 = T) %>%
+rna_gff <- ape::read.gff('Outputs_Complete/combined_rrna.gff', GFF3 = T) %>%
   select(seqid, start, end, strand, attributes) %>%
   filter(!grepl('partial=true', attributes)) %>%
   mutate(attributes = str_replace(attributes, '.*product=', '')) %>%
@@ -23,6 +23,7 @@ for (i in 1:nrow(rna_gff)){
     if(rna_gff[i+1, 'rrna_gene'] == '23S'){rowstokeep <- append(rowstokeep, c(i, i+1))} # adds the row number to the list of rows to keep for the table of rRNA operons
     }
   if(rna_gff[i, 'strand'] == '-'){ # this loop does the same as the previous one but for 16S genes on the reverse strand
+    if(i == 1){next} # stops the loop trying to look for a 23S gene beyond the top of the table, would cause an error
     if(rna_gff[i-1, 'rrna_gene'] != '23S'){next}
     if(rna_gff[i-1, 'seqid'] != rna_gff[i, 'seqid']){next}
     if(rna_gff[i-1, 'strand'] != '-'){next}
@@ -43,7 +44,8 @@ operons <- operons %>%
   mutate(ITS_Length = if_else(strand == '+', start_23S - end_16S, start_16S - end_23S)) %>%
   mutate(Linkage = if_else(ITS_Length > 1500, 'Unlinked', 'Linked')) %>%
   mutate(V1 = str_replace(seqid, '\\.[0-9]', '')) %>%
-  left_join(read.delim('RefSeq/Outputs_Complete/seq_length.tsv', header = F, sep = '\t')) %>%
+  left_join(read.delim('Outputs_Complete/seq_length.tsv', header = F, sep = '\t'),
+            by = c('seqid' = 'V1')) %>%
   rename(Sequence_Length = V2) %>%
   select(-V1) %>%
   rowwise() %>%
@@ -54,7 +56,7 @@ operons <- operons %>%
 # write unlinked and boundary-crossing operons to file
 operons %>%
   filter(CrossBoundary == TRUE | Linkage == 'Unlinked') %>%
-  write.table('RefSeq/Outputs_Complete/operons_unlinked_or_crossingboundary.tsv', quote = F, row.names = F, sep = '\t')
+  write.table('Outputs_Complete/operons_unlinked_or_crossingboundary.tsv', quote = F, row.names = F, sep = '\t')
 
 # create a 'master gff' will all the info needed for the next two steps
 operons <- operons %>%
@@ -70,14 +72,14 @@ operons <- operons %>%
 
 # write the master gff to file for plotting later
 operons %>%
-  write.table('RefSeq/Outputs_Complete/master_rrna.gff', quote = F, row.names = F, sep = '\t')
+  write.table('Outputs_Complete/master_rrna.gff', quote = F, row.names = F, sep = '\t')
 
 # write the coordinates of each 'good quality' operon's ITS region to a gff-like file
 operons %>%
   mutate(seqid_operon = paste0(seqid, ' ', OperonID)) %>%
   select(seqid_operon, source, type, start_ITS, end_ITS, score, strand, phase) %>%
   rename(start = start_ITS, end = end_ITS) %>%
-  write.table('RefSeq/Outputs_Complete/full_ITS.gff', quote = F, row.names = F, col.names = F, sep = '\t')
+  write.table('Outputs_Complete/full_ITS.gff', quote = F, row.names = F, col.names = F, sep = '\t')
 
 # define the start and end point of each 'good quality' operon and format similar to GFF, write to file to allow extraction of FASTA sequence using bedtools
 operons %>%
@@ -86,11 +88,11 @@ operons %>%
   mutate(end = max(start_23S, end_23S, start_16S, end_16S)) %>%
   select(seqid_operon, source, type, start, end, score, strand, phase) %>% 
   mutate(seqid_operon = str_replace(seqid_operon, ' .*', '')) %>% 
-  write.table('RefSeq/Outputs_Complete/full_operons.gff', quote = F, row.names = F, col.names = F, sep = '\t')
+  write.table('Outputs_Complete/full_operons.gff', quote = F, row.names = F, col.names = F, sep = '\t')
 
 # create a file with the unique operon identifiers that can be substituted into the fasta file downstream
 operons %>%
   mutate(seqid_operon = paste0(seqid, ' ', OperonID)) %>%
   select(seqid_operon) %>%
-  write.table('RefSeq/Outputs_Complete/operon_identifiers.txt', row.names = F, col.names = F, quote = F, sep = '\t')
+  write.table('Outputs_Complete/operon_identifiers.txt', row.names = F, col.names = F, quote = F, sep = '\t')
 

@@ -2,24 +2,27 @@
 
 for i in "RefSeq" "GTDB"
 do
-    for j in "Complete" "Combined"
-    do
-        for k in "full" "nrRep"
-        do
-        
-        in_silico_PCR.pl \
-            -s Database/${i}/${j}/${k}.fna.gz \
-            -p primerpairs.txt \
-            -l 10000 \
-            > FilesForPlotting/${i}_primertest_description_${j}${k}.txt \
-            2> FilesForPlotting/${i}_primertest_amplicons_${j}${k}.fna
-        
-        done
-    done
+    in_silico_PCR.pl \
+        -s Database_${i}_207/Full/full.fna.gz \
+        -p primerpairs.txt \
+        -l 10000 \
+        > FilesForPlotting_207/${i}_primertest_description_full.txt \
+        2> Fangorn_${i}_207/${i}_primertest_amplicons_full.fna
+
+    in_silico_PCR.pl \
+        -s Database_${i}_207/NR/nrRep.fna.gz \
+        -p primerpairs.txt \
+        -l 10000 \
+        > FilesForPlotting_207/${i}_primertest_description_nrRep.txt \
+        2> Fangorn_${i}_207/${i}_primertest_amplicons_nrRep.fna
 done
 
-rename 'RefSeq' 'refseq' FilesForPlotting/RefSeq_*
-rename 'GTDB' 'gtdb' FilesForPlotting/*
+mv FilesForPlotting_207/GTDB_primertest_description_full.txt FilesForPlotting_207/gtdb_primertest_amplicons_full.txt
+mv FilesForPlotting_207/GTDB_primertest_description_nrRep.txt FilesForPlotting_207/gtdb_primertest_amplicons_nrRep.txt
+mv FilesForPlotting_207/RefSeq_primertest_description_full.txt FilesForPlotting_207/refseq_primertest_amplicons_full.txt
+mv FilesForPlotting_207/RefSeq_primertest_description_nrRep.txt FilesForPlotting_207/refseq_primertest_amplicons_nrRep.txt
 
-# send email notification that the script is complete
-mail -s 'InSilicoPCR Complete' calum.walsh@unimelb.edu.au < /dev/null
+mv Fangorn_GTDB_207/GTDB_primertest_amplicons_full.fna Fangorn_GTDB_207/gtdb_primertest_amplicons_full.fna
+mv Fangorn_GTDB_207/GTDB_primertest_amplicons_nrRep.fna Fangorn_GTDB_207/gtdb_primertest_amplicons_nrRep.fna
+mv Fangorn_RefSeq_207/RefSeq_primertest_amplicons_full.fna Fangorn_RefSeq_207/refseq_primertest_amplicons_full.fna
+mv Fangorn_RefSeq_207/RefSeq_primertest_amplicons_nrRep.fna Fangorn_RefSeq_207/refseq_primertest_amplicons_nrRep.fna

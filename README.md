@@ -1,22 +1,14 @@
 # FANGORN: Full-length Amplicons for the Next Generation Of rRNa analysis
 ### A quality-checked and publicly available database of full-length 16S-ITS-23S rRNA operon sequences
 
-This repository makes available the scripts used to build the FANGORN databases described in this preprint (REMINDER TO LINK) and available for download [here](https://melbourne.figshare.com/account/projects/119793/articles/19530565).  
-FANGORN was envisaged as a tool to aid standardisation of 16S-ITS-23S rRNA analysis and allow comparison of results and, as such, building your own version would defeat the purpose.  
+This repository makes available the scripts used to build the FANGORN databases described in this preprint (REMINDER TO LINK) and available for download [here](https://melbourne.figshare.com/articles/dataset/Fangorn_rrn_Database/20086916).  
+FANGORN is envisaged as a tool to aid standardisation of 16S-ITS-23S rRNA analysis and allow comparison of results and, as such, building your own version would defeat the purpose.  
 Please get in touch if you have any comments, issues, or suggestions for improvements.
 
-I plan to update the database with each new GTDB release.
+I plan to update the database with each new RefSeq and GTDB release.
 
-Note: If you want to build your own version using the NCBI taxonomy system, make sure you have the most up-to-date version of the taxonomy database. I do this using the commands described in the [TaxonKit manual](https://bioinf.shenwei.me/taxonkit/usage/#before-use) described below.
-```shell
-wget -c ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz
-tar -zxvf taxdump.tar.gz
-
-mkdir -p TaxonKit/
-mv names.dmp nodes.dmp delnodes.dmp merged.dmp TaxonKit/
-rm -f citations.dmp division.dmp gc.prt gencode.dmp readme.txt taxdump.tar.gz
-```
-You do not need to do this when using the GTDB taxonomy system as the information is available on [the website](https://gtdb.ecogenomic.org/downloads) and will be automatically downloaded in the scripts provided.
+Note: If you want to build your own version using the NCBI taxonomy system, make sure you have the most up-to-date version of the taxonomy database. I do this using the commands described in the [TaxonKit manual](https://bioinf.shenwei.me/taxonkit/usage/#before-use). This does not download automatically as I often encounter an EOF error while extracting the `taxdump` tarball so it is less hassle to do it manually using the accomanying script `get_taxonkit_DB.sh` before running `refseq_farngorn.sh`.  
+You do not need to do this when using the GTDB taxonomy system as the information is available on [the website](https://gtdb.ecogenomic.org/downloads) and will be automatically downloaded when running `gtdb_fangorn.sh`.
 
 ## Dependencies
 Make sure these are in your $PATH
@@ -26,7 +18,9 @@ Make sure these are in your $PATH
 | [Barrnap](https://github.com/tseemann/barrnap) | 0.9 |
 | [BBTools](https://jgi.doe.gov/data-and-tools/bbtools/) | 38.90  |
 | [BEDTools](https://github.com/arq5x/bedtools2) | 2.30.0  |
+| [csvtk](https://github.com/shenwei356/csvtk) | 0.24.0 |
 | [R](https://www.r-project.org/) | 4.1.0  |
+| [SeqKit](https://github.com/shenwei356/seqkit) | 2.2.0 |
 | [TaxonKit](https://bioinf.shenwei.me/taxonkit/) | 0.8.0  |
 | [VSEARCH](https://github.com/torognes/vsearch) | 2.17.1  |
 
@@ -39,7 +33,8 @@ Make sure these are in your $PATH
 | [Ape](https://cran.r-project.org/web/packages/ape/index.html) | 5.0 |
 
 The conda environment that I used to build the database can be created using `conda env create -f fangorn.yml` (the yml is provded in this repository).  
-This will create an environment called `fangorn` which can be loaded with `conda activate fangorn`
+This will create an environment called `fangorn` which can be loaded with `conda activate fangorn`.  
+This environmelt contains everything except `csvtk` and `Seqkit`. These are available through bioconda but I used preexisting non-conda installations.
 
 ## Usage
 
@@ -49,7 +44,7 @@ By default they will use:
 - 50 threads for VSEARCH clustering  
 - 20 threads for identifying rRNA genes in genomes without accompanying annotation using Barrnap  
 
-These settings, along with VSEARCH clustering identity (default: 99.9%) and output directory (default: `./Fangorn_GTDB/` or `./Fangorn_RefSeq/`) can be changed by editing the relevant values in lines 2-7 of the script.  
+These settings, along with VSEARCH clustering identity (default: 99.9%) and output directory (default: `./Fangorn_GTDB/` or `./Fangorn_RefSeq/`) can be changed by editing the variables at the beginning of the relevant script.  
 
-Both scripts mentioned above will do the majority of the work but will use the R scripts to identify potential _rrn_ operons and perform quality checking (the details of this QC can be found in the FANGRON publication) and join _rrn_ operon identifiers to the source genome taxonomy.
+Both scripts mentioned above will do the majority of the work but will call R scripts to identify potential _rrn_ operons and perform quality checking (the details of this QC can be found in the FANGRON publication) and join _rrn_ operon identifiers to the source genome taxonomy.
 R scripts are also used by the GTDB database builder to extract assembly information and identify genomes which are missing annotation.
