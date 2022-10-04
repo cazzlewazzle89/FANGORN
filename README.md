@@ -47,4 +47,10 @@ By default they will use:
 These settings, along with VSEARCH clustering identity (default: 99.9%) and output directory (default: `./Fangorn_GTDB/` or `./Fangorn_RefSeq/`) can be changed by editing the variables at the beginning of the relevant script.  
 
 Both scripts mentioned above will do the majority of the work but will call R scripts to identify potential _rrn_ operons and perform quality checking (the details of this QC can be found in the FANGRON publication) and join _rrn_ operon identifiers to the source genome taxonomy.
-R scripts are also used by the GTDB database builder to extract assembly information and identify genomes which are missing annotation.
+R scripts are also used by the GTDB database builder to extract assembly information and identify genomes which are missing annotation.  
+
+## To-do  
+
+* Train NB classifier for each primer set based on each database and taxonomy system
+* Compare phylogenetic resolution of V4, 16S and _rrn_
+* Build phylogenetic tree for SEPP
