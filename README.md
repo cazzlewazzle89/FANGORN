@@ -7,7 +7,8 @@ Please get in touch if you have any comments, issues, or suggestions for improve
 
 I plan to update the database with each new RefSeq and GTDB release.
 
-Note: If you want to build your own version using the NCBI taxonomy system, make sure you have the most up-to-date version of the taxonomy database. I do this using the commands described in the [TaxonKit manual](https://bioinf.shenwei.me/taxonkit/usage/#before-use). This does not download automatically as I often encounter an EOF error while extracting the `taxdump` tarball so it is less hassle to do it manually using the accomanying script `get_taxonkit_DB.sh` before running `refseq_farngorn.sh`.  
+Note: If you want to build your own version using the NCBI taxonomy system, make sure you have the most up-to-date version of the taxonomy database. I do this using the commands described in the [TaxonKit manual](https://bioinf.shenwei.me/taxonkit/usage/#before-use).  
+This does not download automatically as I often encounter an EOF error while extracting the `taxdump` tarball so it is less hassle to do it manually using the accomanying script `get_taxonkit_DB.sh` before running `refseq_farngorn.sh`.  
 You do not need to do this when using the GTDB taxonomy system as the information is available on [the website](https://gtdb.ecogenomic.org/downloads) and will be automatically downloaded when running `gtdb_fangorn.sh`.
 
 ## Dependencies
@@ -34,7 +35,7 @@ Make sure these are in your $PATH
 
 The conda environment that I used to build the database can be created using `conda env create -f fangorn.yml` (the yml is provded in this repository).  
 This will create an environment called `fangorn` which can be loaded with `conda activate fangorn`.  
-This environmelt contains everything except `csvtk` and `Seqkit`. These are available through bioconda but I used preexisting non-conda installations.
+This environment contains everything except `csvtk` and `Seqkit`. These are available through bioconda but I used preexisting non-conda installations.
 
 ## Usage
 
@@ -46,7 +47,7 @@ By default they will use:
 
 These settings, along with VSEARCH clustering identity (default: 99.9%) and output directory (default: `./Fangorn_GTDB/` or `./Fangorn_RefSeq/`) can be changed by editing the variables at the beginning of the relevant script.  
 
-Both scripts mentioned above will do the majority of the work but will call R scripts to identify potential _rrn_ operons and perform quality checking (the details of this QC can be found in the FANGRON publication) and join _rrn_ operon identifiers to the source genome taxonomy.
+Both scripts mentioned above will do the majority of the work but will call R scripts to identify potential _rrn_ operons, perform quality checking (the details of which can be found in the FANGRON publication), and join _rrn_ operon identifiers to the source genome taxonomy.
 R scripts are also used by the GTDB database builder to extract assembly information and identify genomes which are missing annotation.  
 
 ## To-do  
