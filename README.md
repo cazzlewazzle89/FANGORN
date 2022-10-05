@@ -3,9 +3,10 @@
 
 This repository makes available the scripts used to build the FANGORN databases described in this preprint (REMINDER TO LINK) and available for download [here](https://melbourne.figshare.com/articles/dataset/Fangorn_rrn_Database/20086916).  
 FANGORN is envisaged as a tool to aid standardisation of 16S-ITS-23S rRNA analysis and allow comparison of results and, as such, building your own version would defeat the purpose.  
+
 Please get in touch if you have any comments, issues, or suggestions for improvements.
 
-I plan to update the database with each new RefSeq and GTDB release.
+I plan to update the database in line with each major RefSeq and GTDB release.
 
 Note: If you want to build your own version using the NCBI taxonomy system, make sure you have the most up-to-date version of the taxonomy database. I do this using the commands described in the [TaxonKit manual](https://bioinf.shenwei.me/taxonkit/usage/#before-use).  
 This does not download automatically as I often encounter an EOF error while extracting the `taxdump` tarball so it is less hassle to do it manually using the accomanying script `get_taxonkit_DB.sh` before running `refseq_farngorn.sh`.  
