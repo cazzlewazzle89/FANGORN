@@ -52,6 +52,6 @@ R scripts are also used by the GTDB database builder to extract assembly informa
 
 ## To-do  
 
-:muscle: Train NB classifier for each primer set based on each database and taxonomy system
-:microscope: Compare phylogenetic resolution of V4, 16S and _rrn_
+:muscle: Train NB classifier for each primer set based on each database and taxonomy system  
+:microscope: Compare phylogenetic resolution of V4, 16S and _rrn_  
 :palm_tree: Build phylogenetic tree for SEPP
