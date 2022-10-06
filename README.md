@@ -59,5 +59,5 @@ Also included in the `Scripts/` folder are scripts to:
 ## To-do  
 
 :muscle: Train NB classifier for each primer set based on each database and taxonomy system  
-:microscope: Compare phylogenetic resolution of V4, 16S and _rrn_  (is full 16S or _rrn_ more representative of whole genome identity that V4?)
+:microscope: Compare phylogenetic resolution of V4, 16S and _rrn_  (is full 16S or _rrn_ more representative of whole genome identity that V4?)  
 :palm_tree: Build phylogenetic tree for SEPP  
