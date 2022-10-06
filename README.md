@@ -51,8 +51,13 @@ These settings, along with VSEARCH clustering identity (default: 99.9%) and outp
 Both scripts mentioned above will do the majority of the work but will call R scripts to identify potential _rrn_ operons, perform quality checking (the details of which can be found in the FANGRON publication), and join _rrn_ operon identifiers to the source genome taxonomy.
 R scripts are also used by the GTDB database builder to extract assembly information and identify genomes which are missing annotation.  
 
+Also included in the `Scripts/` folder are scripts to:  
+* collate the files necessary to generate the manuscripts figures and statistics  
+* calculate average nucleotide identity (ANI) between all pairwise combinations of complete genomes used to construct both GTDB and RefSeq databases  
+* train a Qiime2 Naive Bayes feature classifier to assign taxonomy to amplicons (generated using all tested primer pairs) using each database - I will make these available shortly
+
 ## To-do  
 
 :muscle: Train NB classifier for each primer set based on each database and taxonomy system  
-:microscope: Compare phylogenetic resolution of V4, 16S and _rrn_  
-:palm_tree: Build phylogenetic tree for SEPP
+:microscope: Compare phylogenetic resolution of V4, 16S and _rrn_  (is full 16S or _rrn_ more representative of whole genome identity that V4?)
+:palm_tree: Build phylogenetic tree for SEPP  
